@@ -7,6 +7,7 @@
 ## 🚀 Live Demo
 
 > Deploy link here (see Deliverables section in assignment)
+> https://scaler-aws-route53.vercel.app/login
 
 ---
 
