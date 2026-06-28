@@ -1,0 +1,12 @@
+; BIND Zone File for nexus-games.io
+; Use this file to test the BIND Import feature in the Route 53 Clone
+$TTL 300
+
+@               IN  A       185.190.140.10
+@               IN  AAAA    2001:db8::10
+www             IN  CNAME   @
+lobby           IN  A       185.190.140.22
+eu-server-1     60  IN  A   185.190.140.50
+us-server-1     60  IN  A   185.190.140.60
+_minecraft._tcp 3600 IN SRV 0 5 25565 us-server-1.nexus-games.io.
+discord-verify  IN  TXT     "discord-verification=789abcde"
