@@ -26,10 +26,32 @@ if is_sqlite:
         cursor.close()
 else:
     # Standard PostgreSQL configuration (Supabase, Neon, etc.)
-    # Handle auto-converting "postgres://" to "postgresql://" (Render/Heroku standard format)
-    db_url = settings.DATABASE_URL
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    from urllib.parse import urlparse, quote_plus, urlunparse, unquote
+
+    def format_db_url(url: str) -> str:
+        parsed = urlparse(url)
+        if not parsed.password:
+            return url
+        # Decode first to prevent double-encoding, then safely quote special characters
+        decoded_password = unquote(parsed.password)
+        encoded_password = quote_plus(decoded_password)
+        
+        username = parsed.username or "postgres"
+        port_str = f":{parsed.port}" if parsed.port else ""
+        hostname = parsed.hostname or ""
+        
+        netloc = f"{username}:{encoded_password}@{hostname}{port_str}"
+        new_parts = list(parsed)
+        new_parts[1] = netloc
+        
+        scheme = parsed.scheme
+        if scheme == "postgres":
+            scheme = "postgresql"
+        new_parts[0] = scheme
+        
+        return urlunparse(new_parts)
+
+    db_url = format_db_url(settings.DATABASE_URL)
 
     engine = create_engine(
         db_url,
