@@ -49,6 +49,13 @@ else:
             scheme = "postgresql"
         new_parts[0] = scheme
         
+        # Strip pgbouncer query parameter since psycopg2 doesn't support it
+        if parsed.query:
+            from urllib.parse import parse_qsl, urlencode
+            query_params = parse_qsl(parsed.query)
+            filtered_params = [(k, v) for k, v in query_params if k.lower() != "pgbouncer"]
+            new_parts[4] = urlencode(filtered_params)
+        
         return urlunparse(new_parts)
 
     db_url = format_db_url(settings.DATABASE_URL)
