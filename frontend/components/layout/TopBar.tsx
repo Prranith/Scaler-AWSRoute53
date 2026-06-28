@@ -164,7 +164,7 @@ export function TopBar() {
             src="/aws-logo.jpg"
             alt="AWS Console"
             style={{
-              height: "19px",
+              height: "24px",
               objectFit: "contain",
               display: "block",
             }}

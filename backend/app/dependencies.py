@@ -16,34 +16,16 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    """Validate JWT and return the authenticated user."""
-    if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
+    """Mock authentication: bypass token validation and return the seeded user."""
+    # Always return the seeded admin user from the database
+    user = db.query(User).first()
+    if not user:
+        # Fallback mock user if database is completely empty
+        user = User(
+            id="admin-uuid-placeholder",
+            email="admin@example.com",
+            username="admin",
+            hashed_password="",
+            is_active=True,
         )
-    try:
-        payload = decode_token(credentials.credentials)
-        user_id: str = payload.get("sub")
-        jti: str = payload.get("jti")
-        if not user_id or not jti:
-            raise JWTError("Invalid token payload")
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    if is_token_revoked(db, jti):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has been revoked",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    user = get_user_by_id(db, user_id)
-    if not user or not user.is_active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user

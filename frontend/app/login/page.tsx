@@ -54,33 +54,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      if (step === "root_password") {
-        // Backend takes a username parameter, we pass email input
-        const res = await authApi.login(email, password);
-        const token = res.data.access_token;
-        localStorage.setItem("access_token", token);
-        const meRes = await authApi.me();
-        setAuth(meRes.data, token);
-        router.replace("/zones");
-      } else if (step === "iam_login") {
-        const res = await authApi.login(username, password);
-        const token = res.data.access_token;
-        localStorage.setItem("access_token", token);
-        const meRes = await authApi.me();
-        setAuth(meRes.data, token);
-        router.replace("/zones");
-      } else if (step === "register") {
-        await authApi.register(username, email, password);
-        const res = await authApi.login(username, password);
-        const token = res.data.access_token;
-        localStorage.setItem("access_token", token);
-        const meRes = await authApi.me();
-        setAuth(meRes.data, token);
-        router.replace("/zones");
-      }
+      // Simulate a small network delay
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      const mockUser = {
+        id: "admin-uuid-placeholder",
+        email: email || "admin@example.com",
+        username: username || (email ? email.split("@")[0] : "admin"),
+        is_active: true,
+        created_at: new Date().toISOString()
+      };
+      const mockToken = "mock-jwt-token-bypass-verification";
+
+      localStorage.setItem("access_token", mockToken);
+      setAuth(mockUser, mockToken);
+      router.replace("/zones");
     } catch (err: any) {
-      localStorage.removeItem("access_token");
-      setError(err.response?.data?.detail || "Authentication failed. Please verify your credentials.");
+      setError("An unexpected error occurred during mock sign-in.");
     } finally {
       setLoading(false);
     }
