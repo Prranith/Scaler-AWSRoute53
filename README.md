@@ -40,7 +40,7 @@
 └────────────────────────┬────────────────────────────────┘
                          │ SQLAlchemy ORM
 ┌────────────────────────▼────────────────────────────────┐
-│               DATABASE (SQLite + WAL mode)              │
+│             DATABASE (SQLite or PostgreSQL)             │
 │  Users · Sessions (JWT blocklist) · Zones · Records     │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -53,24 +53,42 @@
 - Python 3.11+
 - Node.js 18+
 - npm 9+
+- A Supabase or hosted PostgreSQL database instance (optional, SQLite is used by default)
 
 ### Backend Setup
 
-```bash
-cd route53-clone/backend
+1. **Configure Environment**:
+   Inside the `backend/` directory, create a `.env` file to override the default database configuration:
+   ```env
+   # To use SQLite (default):
+   DATABASE_URL=sqlite:///./route53.db
+   
+   # To use Supabase (PostgreSQL):
+   DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.migdujpoemykdogfrswd.supabase.co:5432/postgres
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+2. **Install dependencies**:
+   ```bash
+   cd route53-clone/backend
+   pip install -r requirements.txt
+   ```
 
-# Start the API server
-uvicorn app.main:app --reload --port 8000
-```
+3. **Database Migration & Seeding**:
+   Execute the seeding script to compile schemas, build relational tables in the target database, and seed 44 hosted zones:
+   ```bash
+   python seed_zones.py
+   ```
+
+4. **Start the API server**:
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
 
 - API available at: http://localhost:8000
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-**Demo credentials are seeded automatically:** `admin` / `admin123`
+**Demo credentials are seeded automatically:** `admin` / `admin123` (or register a custom account).
 
 ### Frontend Setup
 
@@ -196,14 +214,15 @@ CREATE TABLE dns_records (
 - On logout, session `jti` is marked `revoked=True` in DB
 - Every authenticated request checks if `jti` is revoked → true server-side logout
 
-**SQLite WAL Mode**
-- Write-Ahead Logging enabled for concurrent reads without blocking writes
-- Foreign key enforcement + 64MB cache for performance
-- Proper cascade deletes (delete zone → all records deleted)
+**Dialect-Agnostic Database Engine**
+- Supports **SQLite** (with Write-Ahead Logging WAL mode, foreign keys, and 64MB cache enabled for local environments)
+- Supports **PostgreSQL** (configured with automatic URI password encoding and pool pre-ping connection validation for Supabase, Neon, etc.)
+- Dynamic dialect parsing prevents database-specific query crashes
+- Proper cascade deletes across tables (deleting a hosted zone automatically wipes all related DNS records)
 
-**FastAPI Lifespan**
-- Tables created on startup
-- Demo user seeded if no users exist
+FastAPI Lifespan
+- Relational tables are automatically compiled and created on startup if they don't exist
+- Demo user is seeded if the users table is empty
 - Clean shutdown handling
 
 ### Frontend
@@ -214,17 +233,17 @@ CREATE TABLE dns_records (
 - Stale-while-revalidate for optimal UX
 - 30-second stale time for zones, 15-second for records
 
-**Zustand**
+Zustand
 - Auth state with localStorage persistence
 - Notification system with auto-dismiss
 - Zero-boilerplate compared to Redux
 
-**Optimistic UX**
+Optimistic UX
 - Search with 350ms debounce to reduce API calls
 - Instant loading states with spinners
 - Error handling with toast notifications
 
-**CSS Design System**
+CSS Design System
 - CSS custom properties (variables) for theming
 - Dark mode via `[data-theme="dark"]` attribute
 - AWS color palette: `#0f1523` navy, `#ec7211` orange
@@ -255,8 +274,8 @@ CREATE TABLE dns_records (
 
 ### Backend
 - **FastAPI** (async REST API, OpenAPI docs)
-- **SQLAlchemy 2.0** (async ORM, typed mapped columns)
-- **SQLite** (WAL mode, foreign keys)
+- **SQLAlchemy 2.0** (ORM, typed mapped columns, dialect-agnostic)
+- **PostgreSQL / SQLite** (dialect-agnostic configuration, pool pre-ping, WAL mode)
 - **python-jose** (JWT tokens)
 - **passlib[bcrypt]** (password hashing)
 - **pydantic-settings** (12-factor config)
