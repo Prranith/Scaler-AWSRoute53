@@ -124,7 +124,14 @@ export default function ZoneDetailPage() {
   );
 
   if (zoneLoading) {
-    return <div className="loading-overlay"><div className="spinner spinner-lg" /></div>;
+    return (
+      <div className="loading-overlay">
+        <div className="spinner spinner-lg" />
+        <div className="loading-text" style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "8px" }}>
+          Please wait, while we are fetching data from the backend. This may take up to a few seconds...
+        </div>
+      </div>
+    );
   }
 
   if (!zone) {
@@ -250,7 +257,12 @@ export default function ZoneDetailPage() {
               {recordsLoading ? (
                 <tr>
                   <td colSpan={8}>
-                    <div className="loading-overlay"><div className="spinner spinner-lg" /></div>
+                    <div className="loading-overlay">
+                      <div className="spinner spinner-lg" />
+                      <div className="loading-text" style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "8px" }}>
+                        Please wait, while we are fetching data from the backend. This may take up to a few seconds...
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ) : records.length === 0 ? (
