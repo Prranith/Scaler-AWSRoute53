@@ -52,22 +52,46 @@ export function Sidebar() {
     };
   }, []);
 
+  const handleLinkClick = () => {
+    setIsOpen(false);
+  };
+
   return (
-    <aside className={`sidebar ${isOpen ? "open" : ""}`}>
-      {/* Sidebar Header: Brand name & Close button */}
-      <div className="sidebar-logo">
-        <span className="sidebar-logo-text" style={{ fontSize: 16, fontWeight: 700 }}>
-          Route 53
-        </span>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="sidebar-backdrop"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            zIndex: 998,
+            display: "none",
+          }}
+        />
+      )}
+
+      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+        {/* Sidebar Header: Brand name & Close button */}
+        <div className="sidebar-logo">
+          <span className="sidebar-logo-text" style={{ fontSize: 16, fontWeight: 700 }}>
+            Route 53
+          </span>
         <button
           onClick={() => setIsOpen(false)}
+          className="sidebar-close-btn"
           style={{
             background: "none",
             border: "none",
             color: "var(--aws-sidebar-text-secondary)",
             cursor: "pointer",
             padding: 4,
-            display: "flex",
+            display: "none",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -75,163 +99,171 @@ export function Sidebar() {
         >
           <X size={16} />
         </button>
-      </div>
+        </div>
 
-      <nav className="sidebar-nav">
-        {/* Direct Links */}
-        <Link
-          href="/dashboard"
-          className={`sidebar-nav-item ${isActive("/dashboard") ? "active" : ""}`}
-          style={{ paddingLeft: 20 }}
-        >
-          Dashboard
-        </Link>
+        <nav className="sidebar-nav">
+          {/* Direct Links */}
+          <Link
+            href="/dashboard"
+            onClick={handleLinkClick}
+            className={`sidebar-nav-item ${isActive("/dashboard") ? "active" : ""}`}
+            style={{ paddingLeft: 20 }}
+          >
+            Dashboard
+          </Link>
 
-        <Link
-          href="/zones"
-          className={`sidebar-nav-item ${isActive("/zones") ? "active" : ""}`}
-          style={{ paddingLeft: 20 }}
-        >
-          Hosted zones
-        </Link>
+          <Link
+            href="/zones"
+            onClick={handleLinkClick}
+            className={`sidebar-nav-item ${isActive("/zones") ? "active" : ""}`}
+            style={{ paddingLeft: 20 }}
+          >
+            Hosted zones
+          </Link>
 
-        <Link
-          href="/health-checks"
-          className={`sidebar-nav-item ${isActive("/health-checks") ? "active" : ""}`}
-          style={{ paddingLeft: 20 }}
-        >
-          Health checks
-        </Link>
+          <Link
+            href="/health-checks"
+            onClick={handleLinkClick}
+            className={`sidebar-nav-item ${isActive("/health-checks") ? "active" : ""}`}
+            style={{ paddingLeft: 20 }}
+          >
+            Health checks
+          </Link>
 
-        {/* Collapsible Section: Traffic flow */}
-        <div>
-          <div className="sidebar-section-label" onClick={() => toggleGroup("Traffic flow")}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {openGroups["Traffic flow"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              Traffic flow
-            </span>
-          </div>
-          {openGroups["Traffic flow"] && (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Link
-                href="/traffic-policies"
-                className={`sidebar-nav-item ${isActive("/traffic-policies") ? "active" : ""}`}
-                style={{ paddingLeft: 38 }}
-              >
-                Traffic policies
-              </Link>
-              <Link
-                href="/traffic-policies"
-                className="sidebar-nav-item"
-                style={{ paddingLeft: 38 }}
-              >
-                Policy records
-              </Link>
+          {/* Collapsible Section: Traffic flow */}
+          <div>
+            <div className="sidebar-section-label" onClick={() => toggleGroup("Traffic flow")}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {openGroups["Traffic flow"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                Traffic flow
+              </span>
             </div>
-          )}
-        </div>
-
-        {/* Collapsible Section: Domains */}
-        <div>
-          <div className="sidebar-section-label" onClick={() => toggleGroup("Domains")}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {openGroups["Domains"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              Domains
-            </span>
+            {openGroups["Traffic flow"] && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Link
+                  href="/traffic-policies"
+                  onClick={handleLinkClick}
+                  className={`sidebar-nav-item ${isActive("/traffic-policies") ? "active" : ""}`}
+                  style={{ paddingLeft: 38 }}
+                >
+                  Traffic policies
+                </Link>
+                <Link
+                  href="/traffic-policies"
+                  onClick={handleLinkClick}
+                  className="sidebar-nav-item"
+                  style={{ paddingLeft: 38 }}
+                >
+                  Policy records
+                </Link>
+              </div>
+            )}
           </div>
-          {openGroups["Domains"] && (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Link href="/zones" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Registered domains
-              </Link>
-              <Link href="/zones" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Pending requests
-              </Link>
-            </div>
-          )}
-        </div>
 
-        {/* Collapsible Section: Resolver */}
-        <div>
-          <div className="sidebar-section-label" onClick={() => toggleGroup("Resolver")}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {openGroups["Resolver"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              Resolver
-            </span>
+          {/* Collapsible Section: Domains */}
+          <div>
+            <div className="sidebar-section-label" onClick={() => toggleGroup("Domains")}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {openGroups["Domains"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                Domains
+              </span>
+            </div>
+            {openGroups["Domains"] && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Link href="/zones" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Registered domains
+                </Link>
+                <Link href="/zones" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Pending requests
+                </Link>
+              </div>
+            )}
           </div>
-          {openGroups["Resolver"] && (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Link
-                href="/resolver"
-                className={`sidebar-nav-item ${isActive("/resolver") ? "active" : ""}`}
-                style={{ paddingLeft: 38 }}
-              >
-                VPCs
-              </Link>
-              <Link href="/resolver" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Inbound endpoints
-              </Link>
-              <Link href="/resolver" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Outbound endpoints
-              </Link>
-              <Link
-                href="/profiles"
-                className={`sidebar-nav-item ${isActive("/profiles") ? "active" : ""}`}
-                style={{ paddingLeft: 38 }}
-              >
-                Rules
-              </Link>
-              <Link href="/resolver" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Query logging
-              </Link>
-            </div>
-          )}
-        </div>
 
-        {/* Collapsible Section: DNS Firewall */}
-        <div>
-          <div className="sidebar-section-label" onClick={() => toggleGroup("DNS Firewall")}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {openGroups["DNS Firewall"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              DNS Firewall
-            </span>
+          {/* Collapsible Section: Resolver */}
+          <div>
+            <div className="sidebar-section-label" onClick={() => toggleGroup("Resolver")}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {openGroups["Resolver"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                Resolver
+              </span>
+            </div>
+            {openGroups["Resolver"] && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Link
+                  href="/resolver"
+                  onClick={handleLinkClick}
+                  className={`sidebar-nav-item ${isActive("/resolver") ? "active" : ""}`}
+                  style={{ paddingLeft: 38 }}
+                >
+                  VPCs
+                </Link>
+                <Link href="/resolver" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Inbound endpoints
+                </Link>
+                <Link href="/resolver" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Outbound endpoints
+                </Link>
+                <Link
+                  href="/profiles"
+                  onClick={handleLinkClick}
+                  className={`sidebar-nav-item ${isActive("/profiles") ? "active" : ""}`}
+                  style={{ paddingLeft: 38 }}
+                >
+                  Rules
+                </Link>
+                <Link href="/resolver" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Query logging
+                </Link>
+              </div>
+            )}
           </div>
-          {openGroups["DNS Firewall"] && (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Link href="/zones" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Rule groups
-              </Link>
-              <Link href="/zones" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Domain lists
-              </Link>
-            </div>
-          )}
-        </div>
 
-        {/* Collapsible Section: Application Recovery Controller */}
-        <div>
-          <div className="sidebar-section-label" onClick={() => toggleGroup("Application Recovery Controller")}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {openGroups["Application Recovery Controller"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              Application Recovery Controller
-            </span>
+          {/* Collapsible Section: DNS Firewall */}
+          <div>
+            <div className="sidebar-section-label" onClick={() => toggleGroup("DNS Firewall")}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {openGroups["DNS Firewall"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                DNS Firewall
+              </span>
+            </div>
+            {openGroups["DNS Firewall"] && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Link href="/zones" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Rule groups
+                </Link>
+                <Link href="/zones" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Domain lists
+                </Link>
+              </div>
+            )}
           </div>
-          {openGroups["Application Recovery Controller"] && (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Link href="/health-checks" className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
-                Getting started
-              </Link>
-            </div>
-          )}
-        </div>
-      </nav>
 
-      {/* Footer shortcut helper info */}
-      <div className="sidebar-footer">
-        <div style={{ fontSize: "11px", color: "var(--aws-sidebar-text-secondary)", marginBottom: "2px" }}>
-          Press <span style={{ fontWeight: 600, color: "var(--aws-sidebar-text)" }}>?</span> for shortcuts
+          {/* Collapsible Section: Application Recovery Controller */}
+          <div>
+            <div className="sidebar-section-label" onClick={() => toggleGroup("Application Recovery Controller")}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {openGroups["Application Recovery Controller"] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                Application Recovery Controller
+              </span>
+            </div>
+            {openGroups["Application Recovery Controller"] && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Link href="/health-checks" onClick={handleLinkClick} className="sidebar-nav-item" style={{ paddingLeft: 38 }}>
+                  Getting started
+                </Link>
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Footer shortcut helper info */}
+        <div className="sidebar-footer">
+          <div style={{ fontSize: "11px", color: "var(--aws-sidebar-text-secondary)", marginBottom: "2px" }}>
+            Press <span style={{ fontWeight: 600, color: "var(--aws-sidebar-text)" }}>?</span> for shortcuts
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

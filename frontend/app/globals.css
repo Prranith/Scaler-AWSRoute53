@@ -1128,6 +1128,9 @@ code, .mono {
   :root { --sidebar-width: 0px; }
   .sidebar { transform: translateX(-240px); }
   .sidebar.open { transform: translateX(0); width: 240px; }
+  .sidebar-backdrop { display: block !important; }
+  .sidebar-close-btn { display: flex !important; }
+  .mobile-menu-toggle-btn { display: flex !important; }
   .main-area { margin-left: 0; }
   .search-input { width: 200px; }
   .stats-grid { grid-template-columns: 1fr 1fr; }

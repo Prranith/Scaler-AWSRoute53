@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { authApi } from "@/lib/api";
 import { useNotificationStore } from "@/store/notificationStore";
-import { Moon, Sun, LogOut, User, Globe, Search, Bell, HelpCircle } from "lucide-react";
+import { Moon, Sun, LogOut, User, Globe, Search, Bell, HelpCircle, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
@@ -119,6 +119,8 @@ export function TopBar() {
 
   const toggleNotifications = () => {
     setShowNotifications(s => !s);
+    setShowUserMenu(false);
+    setShowSearchDropdown(false);
   };
 
   const openHelp = () => {
@@ -129,6 +131,28 @@ export function TopBar() {
     <header className="topbar">
       {/* Left side: AWS Logo & Services Button */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Mobile Hamburger menu toggle */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            window.dispatchEvent(new CustomEvent("toggle-sidebar"));
+          }}
+          className="mobile-menu-toggle-btn"
+          style={{
+            background: "none",
+            border: "none",
+            color: "#ffffff",
+            cursor: "pointer",
+            padding: "4px",
+            display: "none",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          title="Open menu"
+        >
+          <Menu size={18} />
+        </button>
+
         <Link
           href="/dashboard"
           style={{
@@ -215,7 +239,11 @@ export function TopBar() {
             placeholder="Search for services, features, blogs, docs, and more"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setShowSearchDropdown(true)}
+            onFocus={() => {
+              setShowSearchDropdown(true);
+              setShowUserMenu(false);
+              setShowNotifications(false);
+            }}
           />
           <div
             style={{
@@ -456,6 +484,8 @@ export function TopBar() {
             onClick={(e) => {
               e.stopPropagation();
               setShowUserMenu(!showUserMenu);
+              setShowNotifications(false);
+              setShowSearchDropdown(false);
             }}
             className="topbar-action-item"
             style={{ gap: 6, fontWeight: 600 }}
